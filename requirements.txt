@@ -1,0 +1,8 @@
+These packages are required to run the project: 
+    *)Flask,
+    *)Requests,
+    *)Scipy,
+    *)sqlite3,
+    *)numpy,
+    *)statsmodels,
+    *)markupsafe
