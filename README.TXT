@@ -1,4 +1,6 @@
-To start open project in dev container, open terminal and run : 
+IF FLASK IS NOT RECOGNIZED, INSTALL ALL PACKAGES IN REQUIREMENTS MANUALLY USING: pip install <name of the package>
+
+To start open project in dev container, open terminal (bash) and run : 
     cd src
     export FLASK_APP=main.py
     flask run --port=8080
