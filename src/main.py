@@ -112,6 +112,3 @@ def retrieve_statistics():
     }
     
     return result
-
-if __name__ == '__main__':
-    app.run(host="localhost", port=8080, debug=True)

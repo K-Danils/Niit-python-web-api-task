@@ -1,4 +1,4 @@
-To start open project in dev container, open terminal and run : 
+To start open project in dev container, open terminal (bash) and run : 
     cd src
     export FLASK_APP=main.py
     flask run --port=8080
