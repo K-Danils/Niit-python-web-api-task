@@ -111,4 +111,4 @@ def retrieve_statistics():
         "is_stationary" : is_stationary(readings, 0.01)
     }
     
-    return result
+    return { "result":result, "readings":correct_values}
