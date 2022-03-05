@@ -1,11 +1,11 @@
 from markupsafe import escape
 import sqlite3 as sq
-from db_info import name as db_name_and_extension
-from db_info import no_extension_name as db_name
+from db_info import db_path
+from db_info import db_name
 
 def find_by_id(id):
     # returns single reading element if found
-    con = sq.connect(db_name_and_extension)
+    con = sq.connect(db_path)
     cur = con.cursor()
 
     reading = None
@@ -20,7 +20,7 @@ def find_by_id(id):
 
 def get_all_readings():
     #returns list of all reading elements
-    con = sq.connect(db_name_and_extension)
+    con = sq.connect(db_path)
     cur = con.cursor()
 
     readings = []
@@ -33,7 +33,7 @@ def get_all_readings():
 
 def edit_db_reading(id, value, timeStamp):
     #returns true if edit was successful, if not false
-    con = sq.connect(db_name_and_extension)
+    con = sq.connect(db_path)
     cur = con.cursor()
 
     reading = find_by_id(id)
@@ -65,7 +65,7 @@ def edit_db_reading(id, value, timeStamp):
 
 def delete_db_reading(id):
     # returns true if delete was successful, if not false
-    con = sq.connect(db_name_and_extension)
+    con = sq.connect(db_path)
     cur = con.cursor()
 
     reading = find_by_id(id)
@@ -79,16 +79,19 @@ def delete_db_reading(id):
 
     return None
 
-def get_readings_by_time_stamp(timeStamp):
+def get_readings_in_specific_time_window(startingDate, endDate):
     #returns list of all elements with the same timeStamp as provided
-    con = sq.connect(db_name_and_extension)
+    con = sq.connect(db_path)
     cur = con.cursor()
 
     correct_values = []
 
     for row in cur.execute(f''' SELECT * 
                                 FROM {db_name} 
-                                WHERE timeStamp = '{timeStamp}'
+                                WHERE 
+                                timeStamp >= '{escape(startingDate)}' 
+                                AND 
+                                timeStamp <= '{escape(endDate)}'
                                 '''):
         correct_values.append(row)
 
@@ -99,23 +102,25 @@ def get_readings_by_time_stamp(timeStamp):
 def insert_reading(value, timeStamp):
     reading = get_latest_reading_entry()
 
-    con = sq.connect(db_name_and_extension)
+    con = sq.connect(db_path)
     cur = con.cursor()
 
     id = reading[0] + 1 if len(reading) > 0 else 1
 
     cur.execute(f'''INSERT INTO {db_name} 
-                        VALUES (
-                            {id}, 
-                            {value}, '{timeStamp}'
-                            )''')
+                    VALUES (
+                        {id}, 
+                        {escape(value)}, 
+                        '{escape(timeStamp)}'
+                        )''')
 
     con.commit()
     con.close()
 
 def get_latest_reading_entry():
-    con = sq.connect(db_name_and_extension)
+    con = sq.connect(db_path)
     cur = con.cursor()
+
     reading = []
     for row in cur.execute(f'''SELECT * 
                               FROM {db_name} 
@@ -124,6 +129,7 @@ def get_latest_reading_entry():
         reading = row
     con.commit()
     con.close()
+
     return reading
 
 def reading_to_string(reading):

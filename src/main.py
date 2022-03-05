@@ -1,5 +1,3 @@
-from datetime import datetime
-from multiprocessing.sharedctypes import Value
 from flask import Flask
 from flask import jsonify
 from flask import abort
@@ -8,6 +6,7 @@ from db_create import create_db
 from routes import *
 from reading_db_manipulation import *
 from reading_statistics import *
+import datetime
 
 # initialize flask app and create database, if it doesn't exist
 app = Flask(__name__)
@@ -34,8 +33,14 @@ def retrieve_by_id(id):
 def add_reading():
     new_reading = request.get_json()
 
+    #check if dates are the correct format
+    try:
+        timeStamp = datetime.datetime.fromisoformat(new_reading['timeStamp'])
+    except:
+        return abort(400)
+        
     if type(new_reading['value']) is float:
-        insert_reading(new_reading['value'], new_reading['timeStamp'])
+        insert_reading(new_reading['value'], timeStamp)
     else:
         return abort(400)
 
@@ -45,13 +50,19 @@ def add_reading():
 def edit_reading(id):
     new_reading = request.get_json()
 
+    #check if dates are the correct format
+    try:
+        timeStamp = datetime.datetime.fromisoformat(new_reading['timeStamp'])
+    except:
+        return abort(400)
+
     if type(new_reading['value']) is float:
-        if edit_db_reading(id, new_reading['value'], new_reading['timeStamp']):
+        if edit_db_reading(id, new_reading['value'], timeStamp):
             return new_reading
         else:
-            return abort(404)
+            return abort(404) 
     else:
-        return abort(404)
+        return abort(400)
 
 @app.route(DELETE, methods=['DELETE'])
 def delete_reading(id):
@@ -63,14 +74,22 @@ def delete_reading(id):
         return abort(404)
 
 @app.route(STATISTICS, methods=['GET'])
-def retrieve_statistics(timeStamp):
-    correct_values = get_readings_by_time_stamp(timeStamp)
+def retrieve_statistics():
+    time = request.get_json()
 
-    if len(correct_values) is 0:
+    #check if dates are the correct format
+    try:
+        start = datetime.datetime.fromisoformat(time['startDate'])
+        end = datetime.datetime.fromisoformat(time['endDate'])
+    except:
+        return abort(400)
+
+    correct_values = get_readings_in_specific_time_window(start, end)
+
+    if len(correct_values) == 0:
         return abort(404)
 
     readings = get_all_readings()
-    distribution_text = ""
     distribution = is_normal_distribution(readings=correct_values, p_treshold=0.05)
 
     if distribution:
@@ -93,3 +112,6 @@ def retrieve_statistics(timeStamp):
     }
     
     return result
+
+if __name__ == '__main__':
+    app.run(host="localhost", port=8080, debug=True)

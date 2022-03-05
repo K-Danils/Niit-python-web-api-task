@@ -35,8 +35,8 @@ def get_readings_variance(readings):
 def is_normal_distribution(readings, p_treshold):
     # returns whether data set is gaussian distribution or not, by using Shapiro-Wilk test
 
-    # length must be at least 3, otherwise calculation is impossible
-    if len(readings) < 3:
+    # length must be at least 4, otherwise calculation is impossible
+    if len(readings) < 4:
         return False
 
     mean = get_readings_mean(readings)
@@ -57,7 +57,7 @@ def is_stationary(readings, treshold):
     # get all the reading values
     reading_values = [reading[1] for reading in readings]
 
-    if len(reading_values) < 3:
+    if len(reading_values) < 4:
         return "<p>Couldn't calculate stationarity, sample size is too short, must have size of atleast: 3</p>"
 
     result = adfuller(reading_values)

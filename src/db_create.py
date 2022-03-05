@@ -1,9 +1,9 @@
 import sqlite3 as sq
-from db_info import name as db_name_and_extension
-from db_info import no_extension_name as db_name
+from db_info import db_path
+from db_info import db_name
 
 def create_db():
-    con = sq.connect(db_name_and_extension)
+    con = sq.connect(db_path)
     cur = con.cursor()
 
     cur.execute(f'''CREATE TABLE IF NOT EXISTS {db_name}(

@@ -6,3 +6,4 @@ These packages are required to run the project:
     *)numpy,
     *)statsmodels,
     *)markupsafe
+    *)pytest to run tests
